@@ -1,6 +1,6 @@
 typeorm-mapped-types presents a new way to manage TypeORM entities. You can prototype entities that reflect actual database tables and create new entities appropriate for your domain as needed.
 
-This module is based on @nestjs/mapped-types. However, unlike @nestjs/mapped-types, it does not support @nestjs/swagger but only the typeorm decorator. Future versions may include support for @nestjs/swagger.
+This module is based on [@nestjs/mapped-types](https://github.com/nestjs/mapped-types). However, unlike @nestjs/mapped-types, it does not support [@nestjs/swagger](https://github.com/nestjs/swagger) but only the typeorm decorator. Future versions may include support for @nestjs/swagger.
 
 Available mapped types:
 
