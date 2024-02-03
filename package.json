@@ -1,6 +1,6 @@
 {
   "name": "@esnark/typeorm-mapped-types",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "description": "Provide Mapped Types for typeorm",
   "main": "dist/index.js",
   "scripts": {
