@@ -1,0 +1,19 @@
+{
+  "extends": "@tsconfig/node16/tsconfig.json",
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "strictFunctionTypes": false,
+    "stripInternal": true,
+    "useUnknownInCatchVariables": false,
+    "outDir": "dist",
+    "rootDir": "src",
+  },
+  "include": ["src", "*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

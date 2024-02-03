@@ -1,0 +1,26 @@
+{
+  "name": "@esnark/typeorm-mapped-types",
+  "version": "0.1.0-alpha.0",
+  "description": "Provide Mapped Types for typeorm",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "typeorm",
+    "nestjs"
+  ],
+  "author": "ESnark <settimeout1000@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@nestjs/common": "^10.3.1",
+    "@nestjs/mapped-types": "^2.0.4",
+    "@tsconfig/node16": "^16.1.1",
+    "@typescript-eslint/eslint-plugin": "^6.20.0",
+    "eslint": "^8.56.0",
+    "rimraf": "^5.0.5",
+    "typeorm": "^0.3.20",
+    "typescript": "^5.3.3"
+  }
+}
