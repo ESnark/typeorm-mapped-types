@@ -10,6 +10,7 @@ export {
 export function inheritTypeOrmMetadata(
   parentClass: Type<any>,
   targetClass: Function,
+  isPropertyInherited: (propertyKey: string) => boolean,
 ) {
   const metadataArgsStorage = getMetadataArgsStorage();
   const targetEntity = metadataArgsStorage.tables.find(
@@ -22,14 +23,14 @@ export function inheritTypeOrmMetadata(
     });
   }
   const targetColumns = metadataArgsStorage.columns.filter(
-    (column) => column.target === parentClass,
+    (column) => column.target === parentClass && isPropertyInherited(column.propertyName),
   );
   metadataArgsStorage.columns.push(
     ...targetColumns.map((column) => ({ ...column, target: targetClass })),
   );
 
   const targetRelations = metadataArgsStorage.relations.filter(
-    (relation) => relation.target === parentClass,
+    (relation) => relation.target === parentClass && isPropertyInherited(relation.propertyName),
   );
   metadataArgsStorage.relations.push(
     ...targetRelations.map((relation) => ({
@@ -39,7 +40,7 @@ export function inheritTypeOrmMetadata(
   );
 
   const targetIndices = metadataArgsStorage.indices.filter(
-    (index) => index.target === parentClass,
+    (index) => index.target === parentClass
   );
   metadataArgsStorage.indices.push(
     ...targetIndices.map((index) => ({ ...index, target: targetClass })),
@@ -70,7 +71,7 @@ export function inheritTypeOrmMetadata(
   );
 
   const targetEmbeddeds = metadataArgsStorage.embeddeds.filter(
-    (embedded) => embedded.target === parentClass,
+    (embedded) => embedded.target === parentClass && isPropertyInherited(embedded.propertyName),
   );
   metadataArgsStorage.embeddeds.push(
     ...targetEmbeddeds.map((embedded) => ({
@@ -79,7 +80,7 @@ export function inheritTypeOrmMetadata(
     })),
   );
   const targetEntityListeners = metadataArgsStorage.entityListeners.filter(
-    (entityListener) => entityListener.target === parentClass,
+    (entityListener) => entityListener.target === parentClass && isPropertyInherited(entityListener.propertyName),
   );
   metadataArgsStorage.entityListeners.push(
     ...targetEntityListeners.map((entityListener) => ({

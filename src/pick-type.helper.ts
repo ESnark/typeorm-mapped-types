@@ -19,7 +19,7 @@ export function PickType<T, K extends keyof T>(
     }
   }
 
-  inheritTypeOrmMetadata(classRef, PickClassType);
+  inheritTypeOrmMetadata(classRef, PickClassType, isInheritedPredicate);
 
   return PickClassType as MappedType<
     RemoveFieldsWithType<Pick<T, (typeof keys)[number]>, Function>
