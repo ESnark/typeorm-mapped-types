@@ -5,8 +5,8 @@ This module is based on [@nestjs/mapped-types](https://github.com/nestjs/mapped-
 Available mapped types:
 
 * PickType - constructs a new type (class) by picking a set of properties from an input type
-* OmitType - (On development) constructs a type by picking all properties from an input type and then removing a particular set of keys
-* IntersectionType - (Not implemented) combines two types into one new type
+* OmitType - constructs a type by picking all properties from an input type and then removing a particular set of keys
+* ~~IntersectionType~~ - (Not implemented) combines two types into one new type
 
 ## How to use
 ```typescript

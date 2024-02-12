@@ -1,6 +1,6 @@
-import { Type } from '@nestjs/common';
-import { MappedType } from '@nestjs/mapped-types';
-import { RemoveFieldsWithType } from '@nestjs/mapped-types/dist/types/remove-fields-with-type.type';
+import type { Type } from '@nestjs/common';
+import type { MappedType } from '@nestjs/mapped-types';
+import type { RemoveFieldsWithType } from '@nestjs/mapped-types/dist/types/remove-fields-with-type.type';
 import {
   inheritPropertyInitializers,
   inheritTypeOrmMetadata,
