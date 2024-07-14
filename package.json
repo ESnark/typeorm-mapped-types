@@ -1,6 +1,6 @@
 {
   "name": "@esnark/typeorm-mapped-types",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "Provide Mapped Types for typeorm",
   "main": "dist/index.js",
   "scripts": {
@@ -16,6 +16,9 @@
   "dependencies": {
     "@nestjs/common": "^10.3.1",
     "@nestjs/mapped-types": "^2.0.4",
+    "typeorm": "^0.3.20"
+  },
+  "peerDependencies": {
     "typeorm": "^0.3.20"
   },
   "devDependencies": {

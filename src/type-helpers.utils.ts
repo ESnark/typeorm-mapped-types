@@ -1,18 +1,14 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { Type } from '@nestjs/common';
-import { getMetadataArgsStorage } from 'typeorm';
-
-export {
-  inheritValidationMetadata,
-  inheritTransformationMetadata,
-  inheritPropertyInitializers,
-} from '@nestjs/mapped-types';
+export { inheritPropertyInitializers } from '@nestjs/mapped-types';
 
 export function inheritTypeOrmMetadata(
   parentClass: Type<any>,
   targetClass: Function,
   isPropertyInherited: (propertyKey: string) => boolean,
 ) {
-  const metadataArgsStorage = getMetadataArgsStorage();
+  const typeorm: typeof import ('typeorm') = require('typeorm');
+  const metadataArgsStorage: import('typeorm/metadata-args/MetadataArgsStorage').MetadataArgsStorage = typeorm.getMetadataArgsStorage();
   const targetEntity = metadataArgsStorage.tables.find(
     (table) => table.target === parentClass,
   );
