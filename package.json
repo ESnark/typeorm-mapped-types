@@ -24,10 +24,13 @@
   "devDependencies": {
     "@tsconfig/node16": "^16.1.1",
     "@types/jest": "^29.5.12",
-    "@typescript-eslint/eslint-plugin": "^6.20.0",
+    "@types/node": "^20.14.10",
+    "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.56.0",
     "jest": "^29.7.0",
+    "reflect-metadata": "^0.2.0",
     "rimraf": "^5.0.5",
+    "rxjs": "^7.1.0",
     "ts-jest": "^29.1.2",
     "typescript": "^5.3.3"
   },
@@ -53,8 +56,9 @@
         {
           "tsconfig": {
             "strict": false
+          }
         }
-      }]
+      ]
     }
   },
   "homepage": "https://github.com/ESnark/typeorm-mapped-types"
