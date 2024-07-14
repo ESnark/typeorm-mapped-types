@@ -33,15 +33,23 @@
     "url": "https//github.com/ESnark/typeorm-mapped-types.git"
   },
   "jest": {
-    "moduleFileExtensions": ["js", "json", "ts"],
-    "transformIgnorePatterns": ["<rootDir>/node_modules/"],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "transformIgnorePatterns": [
+      "<rootDir>/node_modules/"
+    ],
     "testMatch": [
       "<rootDir>/tests/**/*.spec.ts"
     ],
     "transform": {
-      "^.+\\.ts$": ["ts-jest", {
-        "tsconfig": {
-          "strict": false
+      "^.+\\.ts$": [
+        "ts-jest",
+        {
+          "tsconfig": {
+            "strict": false
         }
       }]
     }
