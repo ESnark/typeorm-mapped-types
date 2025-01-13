@@ -14,7 +14,6 @@
   "author": "ESnark <settimeout1000@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@nestjs/common": "^10.3.1",
     "@nestjs/mapped-types": "^2.0.4",
     "typeorm": "^0.3.20"
   },
@@ -38,6 +37,10 @@
     "type": "git",
     "url": "https//github.com/ESnark/typeorm-mapped-types.git"
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "jest": {
     "moduleFileExtensions": [
       "js",
@@ -61,5 +64,6 @@
       ]
     }
   },
-  "homepage": "https://github.com/ESnark/typeorm-mapped-types"
+  "homepage": "https://github.com/ESnark/typeorm-mapped-types",
+  "packageManager": "yarn@4.6.0"
 }

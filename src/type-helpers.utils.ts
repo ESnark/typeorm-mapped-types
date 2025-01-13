@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-import { Type } from '@nestjs/common';
+import { Type } from './interface';
 export { inheritPropertyInitializers } from '@nestjs/mapped-types';
 
 export function inheritTypeOrmMetadata(
