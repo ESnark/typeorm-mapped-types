@@ -458,7 +458,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@esnark/typeorm-mapped-types@workspace:."
   dependencies:
-    "@nestjs/mapped-types": "npm:^2.1.0"
     "@tsconfig/node16": "npm:^16.1.1"
     "@types/jest": "npm:^29.5.12"
     "@types/node": "npm:^20.14.10"
@@ -804,23 +803,6 @@ __metadata:
     "@jridgewell/resolve-uri": "npm:^3.1.0"
     "@jridgewell/sourcemap-codec": "npm:^1.4.14"
   checksum: 10c0/3d1ce6ebc69df9682a5a8896b414c6537e428a1d68b02fcc8363b04284a8ca0df04d0ee3013132252ab14f2527bc13bea6526a912ecb5658f0e39fd2860b4df4
-  languageName: node
-  linkType: hard
-
-"@nestjs/mapped-types@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "@nestjs/mapped-types@npm:2.1.0"
-  peerDependencies:
-    "@nestjs/common": ^10.0.0 || ^11.0.0
-    class-transformer: ^0.4.0 || ^0.5.0
-    class-validator: ^0.13.0 || ^0.14.0
-    reflect-metadata: ^0.1.12 || ^0.2.0
-  peerDependenciesMeta:
-    class-transformer:
-      optional: true
-    class-validator:
-      optional: true
-  checksum: 10c0/cd9f9236648d8a146a4e6890009415400cca7959c3976acdf6fec2ddddc73546d174e58f935b96c6b2319dc54c76e58a39bf47f41991bcd27d1cb55bca99474e
   languageName: node
   linkType: hard
 
