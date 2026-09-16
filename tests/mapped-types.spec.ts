@@ -1,7 +1,9 @@
 import 'reflect-metadata';
 import {
+  Check,
   Column,
   Entity,
+  Exclusion,
   Index,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -126,5 +128,60 @@ describe('function-style index columns', () => {
 
     const Both = PickType(FnModel, ['a', 'b'] as const);
     expect(indexNames(Both)).toEqual(['IDX_FN']);
+  });
+});
+
+describe('check and exclusion constraints', () => {
+  @Check('CHK_AGE', '"age" > 0')
+  @Check('CHK_TITLE', `"title" <> ''`)
+  @Exclusion('EXCL_PERIOD', 'USING gist ("period" WITH &&)')
+  class ProfileModel {
+    @Column()
+    age: number;
+
+    @Column()
+    title: string;
+
+    @Column({ name: 'period' })
+    validityPeriod: string;
+  }
+
+  const checkNames = (target: Function) =>
+    storage()
+      .checks.filter((check) => check.target === target)
+      .map((check) => check.name)
+      .sort();
+
+  const exclusionNames = (target: Function) =>
+    storage()
+      .exclusions.filter((exclusion) => exclusion.target === target)
+      .map((exclusion) => exclusion.name);
+
+  it('copies every constraint when no column is dropped', () => {
+    const Full = OmitType(ProfileModel, [] as const);
+
+    expect(checkNames(Full)).toEqual(['CHK_AGE', 'CHK_TITLE']);
+    expect(exclusionNames(Full)).toEqual(['EXCL_PERIOD']);
+  });
+
+  it('drops the constraints whose expression references a dropped column', () => {
+    const WithoutAge = OmitType(ProfileModel, ['age'] as const);
+
+    expect(checkNames(WithoutAge)).toEqual(['CHK_TITLE']);
+    expect(exclusionNames(WithoutAge)).toEqual(['EXCL_PERIOD']);
+  });
+
+  it('recognises a dropped column by the name given to @Column', () => {
+    const WithoutPeriod = OmitType(ProfileModel, ['validityPeriod'] as const);
+
+    expect(checkNames(WithoutPeriod)).toEqual(['CHK_AGE', 'CHK_TITLE']);
+    expect(exclusionNames(WithoutPeriod)).toEqual([]);
+  });
+
+  it('keeps only the constraints a picked column can satisfy', () => {
+    const OnlyTitle = PickType(ProfileModel, ['title'] as const);
+
+    expect(checkNames(OnlyTitle)).toEqual(['CHK_TITLE']);
+    expect(exclusionNames(OnlyTitle)).toEqual([]);
   });
 });

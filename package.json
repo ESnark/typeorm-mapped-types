@@ -1,7 +1,7 @@
 {
   "name": "@esnark/typeorm-mapped-types",
-  "version": "0.6.0",
-  "description": "Provide Mapped Types for typeorm",
+  "version": "1.0.0",
+  "description": "Mapped types (PickType, OmitType) for TypeORM entities",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -21,6 +21,9 @@
   ],
   "author": "ESnark <settimeout1000@gmail.com>",
   "license": "MIT",
+  "engines": {
+    "node": ">=16.13.0"
+  },
   "peerDependencies": {
     "typeorm": "^0.3.20 || ^1.0.0"
   },
@@ -34,6 +37,7 @@
     "reflect-metadata": "^0.2.0",
     "rimraf": "^5.0.5",
     "rxjs": "^7.1.0",
+    "sql.js": "^1.13.0",
     "ts-jest": "^29.1.2",
     "typeorm": "^0.3.20",
     "typescript": "^5.3.3"
