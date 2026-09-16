@@ -21,7 +21,10 @@ export function inheritPropertyInitializers(
       .forEach((propertyName) => {
         target[propertyName] = tempInstance[propertyName];
       });
-  } catch {}
+  } catch {
+    // The source class may not be constructible without arguments, in which
+    // case there are no initializers to read off an instance.
+  }
 }
 
 /**
@@ -45,7 +48,10 @@ function referencedPropertyNames(columns: unknown): string[] | undefined {
       if (resolved && typeof resolved === 'object') {
         return Object.keys(resolved);
       }
-    } catch {}
+    } catch {
+      // The function may do something the echoing proxy cannot stand in for;
+      // an unresolved reference is reported as such to the caller.
+    }
   }
   return undefined;
 }
@@ -82,6 +88,10 @@ export function inheritTypeOrmMetadata(
   targetClass: Function,
   isPropertyInherited: (propertyKey: string) => boolean,
 ) {
+  // Resolved lazily on purpose: importing typeorm at module load would make it
+  // a load-time dependency of this package, and the consumer's own copy is the
+  // one whose metadata storage must be written to.
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const typeorm: typeof import ('typeorm') = require('typeorm');
   const metadataArgsStorage: import('typeorm/metadata-args/MetadataArgsStorage').MetadataArgsStorage = typeorm.getMetadataArgsStorage();
 

@@ -19,6 +19,7 @@ import { OmitType, PickType } from '../src';
 
 // @ForeignKey only exists from typeorm 0.3.21 onwards while the supported peer
 // range starts at 0.3.20, so it is resolved at runtime rather than imported.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { ForeignKey } = require('typeorm') as {
   ForeignKey?: (
     type: () => Function,
