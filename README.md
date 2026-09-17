@@ -78,3 +78,16 @@ copied, so the resulting schema stays valid:
 * Table names are copied verbatim, so making an `@Entity` inherit from another
   `@Entity` produces two classes mapped to the same table. Source classes are
   meant to be plain, undecorated prototypes as in the example above.
+
+## Releasing
+
+Releases are driven by the version in `package.json`. Once a commit carrying a
+version that is not yet on npm lands on `main`, `.github/workflows/publish.yml`
+lints, builds and tests it, publishes it to npm with provenance through trusted
+publishing, and creates the matching `v<version>` tag and GitHub Release. The
+release body is the `## <version>` section of `CHANGELOG.md`, with the commit
+list GitHub generates appended below it.
+
+Bumping the version is therefore the whole release process — there is no tag to
+push and no Release to create by hand. A push whose version is already on npm
+does nothing, so the workflow is safe to re-run.
