@@ -1,17 +1,73 @@
+# The version in package.json is the release trigger: once a commit carrying a
+# version that is not yet on npm lands on main, this workflow tests it, publishes
+# it, and creates the matching tag and GitHub Release. Nothing to do when the
+# version is unchanged, so it is safe on every push.
+#
+# Do not rename this file — npm trusted publishing is configured against its
+# path, and a rename would break the OIDC exchange.
 name: Publish to npm
 
 on:
+  push:
+    branches: [main]
+  # Publishing a Release by hand still works, and so does dispatching this
+  # workflow; both end up at the same guarded steps.
   release:
     types: [published]
   workflow_dispatch:
 
 permissions:
-  contents: read
-  # Required for npm trusted publishing (OIDC) and provenance
-  id-token: write
+  contents: write # create the tag and the GitHub Release
+  id-token: write # npm trusted publishing (OIDC) and provenance
+
+# Never let two publishes race for the same version.
+concurrency:
+  group: publish
+  cancel-in-progress: false
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      name: ${{ steps.meta.outputs.name }}
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+      publish: ${{ steps.meta.outputs.publish }}
+      release: ${{ steps.meta.outputs.release }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tags, so the "already released" check is accurate
+
+      - name: Work out what is left to do
+        id: meta
+        run: |
+          NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v$VERSION"
+          {
+            echo "name=$NAME"
+            echo "version=$VERSION"
+            echo "tag=$TAG"
+          } >> "$GITHUB_OUTPUT"
+
+          if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
+            echo "::notice::$NAME@$VERSION is already on npm; nothing to publish."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "::notice::$TAG already exists; nothing to release."
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
   publish:
+    needs: check
+    if: needs.check.outputs.publish == 'true' || needs.check.outputs.release == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,33 +87,66 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      # CI runs the full matrix in parallel; this is the gate on what actually
+      # ships, so the published artifact is never unverified.
+      - name: Lint
+        run: yarn lint
+
       - name: Build
         run: yarn build
 
+      - name: Test
+        run: yarn test
+
+      # Only reachable when a Release was published by hand: on the push path
+      # the tag is derived from package.json and cannot disagree with it.
       - name: Verify release tag matches package.json version
         if: github.event_name == 'release'
         run: |
-          PKG_VERSION=$(node -p "require('./package.json').version")
           TAG_VERSION="${GITHUB_REF_NAME#v}"
-          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
-            echo "::error::package.json version ($PKG_VERSION) does not match release tag ($GITHUB_REF_NAME)"
+          if [ "${{ needs.check.outputs.version }}" != "$TAG_VERSION" ]; then
+            echo "::error::package.json version (${{ needs.check.outputs.version }}) does not match release tag ($GITHUB_REF_NAME)"
             exit 1
-          fi
-
-      - name: Check whether this version is already on npm
-        id: check
-        run: |
-          PKG_NAME=$(node -p "require('./package.json').name")
-          PKG_VERSION=$(node -p "require('./package.json').version")
-          if npm view "$PKG_NAME@$PKG_VERSION" version >/dev/null 2>&1; then
-            echo "::warning::$PKG_NAME@$PKG_VERSION is already published; skipping publish."
-            echo "already_published=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "already_published=false" >> "$GITHUB_OUTPUT"
           fi
 
       # Auth comes from npm trusted publishing (OIDC) — no token needed.
       # Provenance is generated automatically with trusted publishing.
-      - name: Publish
-        if: steps.check.outputs.already_published == 'false'
+      - name: Publish to npm
+        if: needs.check.outputs.publish == 'true'
         run: npm publish --access public
+
+      # Runs after the publish so a failed publish does not leave behind a
+      # Release pointing at a version nobody can install. If the publish
+      # succeeded and this step failed, re-running skips the publish and
+      # creates the Release on its own.
+      - name: Create the tag and GitHub Release
+        if: needs.check.outputs.release == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.check.outputs.tag }}
+          VERSION: ${{ needs.check.outputs.version }}
+        run: |
+          # The CHANGELOG section for this version becomes the body; the commit
+          # list GitHub generates is appended below it.
+          NOTES=''
+          if [ -f CHANGELOG.md ]; then
+            NOTES=$(awk -v want="## $VERSION" '
+              index($0, "## ") == 1 { inside = ($0 == want); next }
+              inside { print }
+            ' CHANGELOG.md)
+          fi
+
+          if [ -n "$(printf '%s' "$NOTES" | tr -d '[:space:]')" ]; then
+            printf '%s\n' "$NOTES" > "$RUNNER_TEMP/release-notes.md"
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --target "$GITHUB_SHA" \
+              --notes-file "$RUNNER_TEMP/release-notes.md" \
+              --generate-notes
+          else
+            echo "::warning::No CHANGELOG.md section for $VERSION; using generated notes only."
+            gh release create "$TAG" \
+              --title "$TAG" \
+              --target "$GITHUB_SHA" \
+              --generate-notes
+          fi

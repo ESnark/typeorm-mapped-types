@@ -6,14 +6,10 @@ on:
   pull_request:
 
 jobs:
-  build:
+  # Lint does not depend on the typeorm version, so it runs once rather than
+  # in every matrix leg.
+  lint:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        # Both supported typeorm major lines (peerDependencies range)
-        typeorm-version: ['^0.3.20', '^1.0.0']
-    name: build (typeorm ${{ matrix.typeorm-version }})
     steps:
       - uses: actions/checkout@v4
 
@@ -28,14 +24,56 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Use typeorm ${{ matrix.typeorm-version }}
-        run: yarn add -D 'typeorm@${{ matrix.typeorm-version }}'
+      - name: Lint
+        run: yarn lint
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Both ends of every supported typeorm line (see peerDependencies), on
+        # the node versions those lines support. typeorm 1.x requires node
+        # ^20.19.0 || ^22.13.0 || >=24.11.0, typeorm 0.3.x requires >=16.13.0.
+        include:
+          - typeorm: '0.3.20' # oldest supported 0.3.x
+            node: 20
+          - typeorm: '^0.3.20' # latest 0.3.x
+            node: 22
+          - typeorm: '1.0.0' # oldest supported 1.x
+            node: 20
+          - typeorm: '^1.0.0' # latest 1.x
+            node: 22
+          - typeorm: '^1.0.0'
+            node: 24
+    name: build (typeorm ${{ matrix.typeorm }}, node ${{ matrix.node }})
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable Corepack (yarn 4 via packageManager field)
+        run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      # --exact keeps the floor entries on the exact version named, instead of
+      # letting yarn widen them to a caret range.
+      - name: Use typeorm ${{ matrix.typeorm }}
+        run: yarn add -D --exact 'typeorm@${{ matrix.typeorm }}'
+
+      - name: Report resolved typeorm version
+        run: yarn info typeorm --json | head -1 | sed -E 's/.*"value":"typeorm@npm:([^"]+)".*/\1/'
 
       - name: Build
         run: yarn build
 
       - name: Test
-        run: yarn test --passWithNoTests
+        run: yarn test
 
       - name: Verify package contents
         run: yarn pack --dry-run
